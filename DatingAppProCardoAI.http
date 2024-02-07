@@ -1,0 +1,6 @@
+@DatingAppProCardoAI_HostAddress = http://localhost:5185
+
+GET {{DatingAppProCardoAI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
