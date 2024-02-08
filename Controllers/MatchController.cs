@@ -38,17 +38,18 @@ namespace DatingAppProCardoAI.Controllers
                 return BadRequest("Profile not found");
             }
 
-            var allProfiles = await _dataContext.Profile.ToListAsync();
+            List<Profile> allProfiles = await _dataContext.Profile.FromSqlRaw("SELECT * FROM dbo.Profile").ToListAsync();
+
 
             MatchProfile newMatch = null; 
 
-            foreach (var profile in allProfiles)
+            foreach (Profile profile in allProfiles)
             {
                 if (profile.Id != currentUserProfile.Id)
                 {
                     var match = new MatchProfile(); 
 
-                    if (match.IsMatch(profile))
+                    if (match.IsMatch(currentUserProfile, profile))
                     {
                         newMatch = new MatchProfile 
                         {
@@ -71,8 +72,6 @@ namespace DatingAppProCardoAI.Controllers
                 return NotFound("No matching profiles found.");
             }
         }
-
-
 
 
         [HttpGet("{id}")]

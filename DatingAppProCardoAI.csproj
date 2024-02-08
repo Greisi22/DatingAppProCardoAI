@@ -8,6 +8,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20240202140039_init.cs" />
+    <Compile Remove="Migrations\20240202140039_init.Designer.cs" />
+    <Compile Remove="Migrations\20240202141502_init2.cs" />
+    <Compile Remove="Migrations\20240202141502_init2.Designer.cs" />
+    <Compile Remove="Migrations\20240205000137_UpdateProfileEntity.cs" />
+    <Compile Remove="Migrations\20240205000137_UpdateProfileEntity.Designer.cs" />
+    <Compile Remove="Migrations\20240206105925_ChangeImageEntity.cs" />
+    <Compile Remove="Migrations\20240206105925_ChangeImageEntity.Designer.cs" />
+    <Compile Remove="Migrations\20240206142319_ChangeSomethingInMessage.cs" />
+    <Compile Remove="Migrations\20240206142319_ChangeSomethingInMessage.Designer.cs" />
+    <Compile Remove="Migrations\20240207103514_AddMatchProfile.cs" />
+    <Compile Remove="Migrations\20240207103514_AddMatchProfile.Designer.cs" />
+    <Compile Remove="Migrations\DataContextModelSnapshot.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.1" />

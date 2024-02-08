@@ -7,18 +7,20 @@
         public  Profile profile { get; set; }
 
 
-      
-        public bool IsMatch(Profile other)
+
+        public bool IsMatch(Profile currentUserProfile, Profile otherProfile)
         {
-            if (profile == null || other == null)
+            if (currentUserProfile == null || otherProfile == null)
             {
                 return false;
             }
 
-            if (profile.Preferences.Equals(other.Description))
+           
+            if (currentUserProfile.Preferences.SequenceEqual(otherProfile.Description))
             {
                 return true;
             }
+
             return false;
         }
 
