@@ -1,6 +1,7 @@
 ﻿using DatingAppProCardoAI.Domain;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Metadata;
 
 
 namespace DatingAppProCardoAI.Data
@@ -35,8 +36,21 @@ namespace DatingAppProCardoAI.Data
                 .WithMany()
                 .HasForeignKey(m => m.ReceiverId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MatchProfile>()
+               .HasOne(m => m.currentprofile)
+               .WithMany()
+               .HasForeignKey(m => m.CurrentProfileId)
+               .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<MatchProfile>()
+                .HasOne(m => m.matchprofile)
+                .WithMany()
+                .HasForeignKey(m => m.MatchProfileId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
 
 
     }
 }
+                

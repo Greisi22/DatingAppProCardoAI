@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DatingAppProCardoAI.Data;
+
 using DatingAppProCardoAI.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -47,15 +48,31 @@ namespace DatingAppProCardoAI.Controllers
         }
 
         [HttpGet("Message")]
-        public async Task<IActionResult> GetImage(int id)
+        public async Task<IActionResult> GetChatMessages(String receiverId)
         {
-            var message = await _dataContext.Message.FindAsync(id);
-            if (message == null)
+            var sender = await _userManager.GetUserAsync(User);
+            if (sender == null)
             {
-                return NotFound("Image not found");
+                return BadRequest("User not found!");
             }
 
-            return Ok(message);
+            var senderId = sender.Id;
+
+            var chatMessages = await _dataContext.Message
+                .Where(m => (m.SenderId == senderId && m.ReceiverId == receiverId) ||
+                            (m.SenderId == receiverId && m.ReceiverId == senderId))
+                .OrderBy(m => m.timeSend)
+                .ToListAsync();
+
+
+            var chatMessageContents = new List<string>();
+
+            foreach (var chatMessage in chatMessages)
+            {
+                chatMessageContents.Add(chatMessage.ContentOfMessage + " " + chatMessage.timeSend);
+            }
+            return Ok(chatMessageContents);
+
         }
 
 

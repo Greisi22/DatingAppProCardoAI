@@ -20,7 +20,6 @@
     <Compile Remove="Migrations\20240206142319_ChangeSomethingInMessage.Designer.cs" />
     <Compile Remove="Migrations\20240207103514_AddMatchProfile.cs" />
     <Compile Remove="Migrations\20240207103514_AddMatchProfile.Designer.cs" />
-    <Compile Remove="Migrations\DataContextModelSnapshot.cs" />
   </ItemGroup>
 
   <ItemGroup>

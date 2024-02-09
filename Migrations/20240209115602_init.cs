@@ -216,7 +216,8 @@ namespace DatingAppProCardoAI.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ImageFileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     publishedDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    ProfileId = table.Column<int>(type: "int", nullable: false)
+                    ProfileId = table.Column<int>(type: "int", nullable: false),
+                    IsProfile = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -235,17 +236,22 @@ namespace DatingAppProCardoAI.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ProfileId = table.Column<int>(type: "int", nullable: false)
+                    CurrentProfileId = table.Column<int>(type: "int", nullable: false),
+                    MatchProfileId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MatchProfile", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MatchProfile_Profile_ProfileId",
-                        column: x => x.ProfileId,
+                        name: "FK_MatchProfile_Profile_CurrentProfileId",
+                        column: x => x.CurrentProfileId,
                         principalTable: "Profile",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_MatchProfile_Profile_MatchProfileId",
+                        column: x => x.MatchProfileId,
+                        principalTable: "Profile",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -293,9 +299,14 @@ namespace DatingAppProCardoAI.Migrations
                 column: "ProfileId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MatchProfile_ProfileId",
+                name: "IX_MatchProfile_CurrentProfileId",
                 table: "MatchProfile",
-                column: "ProfileId");
+                column: "CurrentProfileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MatchProfile_MatchProfileId",
+                table: "MatchProfile",
+                column: "MatchProfileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Message_ReceiverId",

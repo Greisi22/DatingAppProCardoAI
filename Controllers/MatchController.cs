@@ -41,22 +41,22 @@ namespace DatingAppProCardoAI.Controllers
             List<Profile> allProfiles = await _dataContext.Profile.FromSqlRaw("SELECT * FROM dbo.Profile").ToListAsync();
 
 
-            MatchProfile newMatch = null; 
+            MatchProfile newMatch = null;
 
             foreach (Profile profile in allProfiles)
             {
                 if (profile.Id != currentUserProfile.Id)
                 {
-                    var match = new MatchProfile(); 
+                    var match = new MatchProfile();
 
                     if (match.IsMatch(currentUserProfile, profile))
                     {
-                        newMatch = new MatchProfile 
+                        newMatch = new MatchProfile
                         {
-                            ProfileId = profile.Id
+                            MatchProfileId = profile.Id
                         };
 
-                        _dataContext.MatchProfile.Add(newMatch); 
+                        _dataContext.MatchProfile.Add(newMatch);
                     }
                 }
             }

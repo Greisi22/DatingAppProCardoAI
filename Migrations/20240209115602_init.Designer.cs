@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DatingAppProCardoAI.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240207125900_init")]
+    [Migration("20240209115602_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -41,6 +41,9 @@ namespace DatingAppProCardoAI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsProfile")
+                        .HasColumnType("bit");
+
                     b.Property<int>("ProfileId")
                         .HasColumnType("int");
 
@@ -62,12 +65,17 @@ namespace DatingAppProCardoAI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ProfileId")
+                    b.Property<int>("CurrentProfileId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MatchProfileId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProfileId");
+                    b.HasIndex("CurrentProfileId");
+
+                    b.HasIndex("MatchProfileId");
 
                     b.ToTable("MatchProfile");
                 });
@@ -340,7 +348,7 @@ namespace DatingAppProCardoAI.Migrations
             modelBuilder.Entity("DatingAppProCardoAI.Domain.Image", b =>
                 {
                     b.HasOne("DatingAppProCardoAI.Domain.Profile", "Profile")
-                        .WithMany()
+                        .WithMany("images")
                         .HasForeignKey("ProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -350,13 +358,21 @@ namespace DatingAppProCardoAI.Migrations
 
             modelBuilder.Entity("DatingAppProCardoAI.Domain.MatchProfile", b =>
                 {
-                    b.HasOne("DatingAppProCardoAI.Domain.Profile", "profile")
+                    b.HasOne("DatingAppProCardoAI.Domain.Profile", "currentprofile")
                         .WithMany()
-                        .HasForeignKey("ProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("CurrentProfileId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("profile");
+                    b.HasOne("DatingAppProCardoAI.Domain.Profile", "matchprofile")
+                        .WithMany()
+                        .HasForeignKey("MatchProfileId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("currentprofile");
+
+                    b.Navigation("matchprofile");
                 });
 
             modelBuilder.Entity("DatingAppProCardoAI.Domain.Message", b =>
@@ -438,6 +454,11 @@ namespace DatingAppProCardoAI.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DatingAppProCardoAI.Domain.Profile", b =>
+                {
+                    b.Navigation("images");
                 });
 #pragma warning restore 612, 618
         }

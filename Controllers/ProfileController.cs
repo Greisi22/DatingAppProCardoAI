@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DatingAppProCardoAI.Data;
+using DatingAppProCardoAI.Domain;
 using DatingAppProCardoAI.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -78,6 +79,37 @@ namespace DatingAppProCardoAI.Controllers
             }
 
             return Ok(profile);
+        }
+
+        [HttpGet("Anyprofile")]
+        public async Task<IActionResult> GetAnyProfile(int Id)
+        {
+
+            var profile = await _dataContext.Profile.FirstOrDefaultAsync(p => p.Id == Id);
+
+            if (profile == null)
+            {
+                return BadRequest("Profile not found");
+ 
+            }
+
+            var image = await _dataContext.Image.FirstOrDefaultAsync(i => i.ProfileId == Id);
+            if (image == null)
+            {
+                return BadRequest("There is no image");
+            }
+
+            //var matches = await _dataContext.MatchProfile.Where(m => m.MatchProfileId == Id).ToListAsync();
+
+          
+            var profileWithImageAndMatches = new
+            {
+                Profile = profile,
+                Image = image,
+                //Matches = matches
+            };
+
+            return Ok(profileWithImageAndMatches);
         }
     }
 }

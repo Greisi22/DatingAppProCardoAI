@@ -12,5 +12,6 @@ namespace DatingAppProCardoAI.Domain
         public string Description { get; set; } 
         public string Preferences { get; set; } 
         public IdentityUser User { get; set; }
+        public ICollection<Image>  images { get; set; }
     }
 }
