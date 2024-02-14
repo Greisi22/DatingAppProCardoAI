@@ -16,21 +16,27 @@ namespace DatingAppProCardoAI.Domain
 
 
 
-        public bool IsMatch(Profile currentUserProfile, Profile otherProfile)
+        public bool IsMatch(Profile currentprofile, Profile otherProfile)
         {
-            if (currentUserProfile == null || otherProfile == null)
+            if (currentprofile == null || otherProfile == null)
             {
                 return false;
             }
 
 
-            if (currentUserProfile.Preferences.SequenceEqual(otherProfile.Description))
+            string[] currentWords = currentprofile.Description.Split(' ');
+            string[] otherWords = otherProfile.Preferences.Split(' ');
+
+            foreach (string word in otherWords)
             {
-                return true;
+                if (currentWords.Contains(word))
+                {
+                    return true;
+                }
             }
 
             return false;
-        }
 
+        }
     }
 }

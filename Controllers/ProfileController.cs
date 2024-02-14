@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace DatingAppProCardoAI.Controllers
 {
@@ -78,7 +80,28 @@ namespace DatingAppProCardoAI.Controllers
                 return NotFound("Profile not found");
             }
 
-            return Ok(profile);
+            var images = await _dataContext.Image.Where(i => i.ProfileId == profile.Id && i.IsProfilePicture == true).ToListAsync();
+
+            var matches = await _dataContext.MatchProfile.Where(m => m.MatchProfileId == profile.Id).Select(m => m.MatchProfileId).ToListAsync();
+
+
+            var profileWithImageAndMatches = new
+            {
+                Profile = new { UserName = profile.UserName, Hobbies = profile.Hobbies, Preferences = profile.Preferences},
+                Image = images,
+                Matches = matches
+            };
+
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve, 
+            };
+
+          
+            var jsonString = JsonSerializer.Serialize(profileWithImageAndMatches, options);
+
+          
+            return Ok(jsonString);
         }
 
         [HttpGet("Anyprofile")]
@@ -93,23 +116,29 @@ namespace DatingAppProCardoAI.Controllers
  
             }
 
-            var image = await _dataContext.Image.FirstOrDefaultAsync(i => i.ProfileId == Id);
-            if (image == null)
-            {
-                return BadRequest("There is no image");
-            }
+            var images = await _dataContext.Image.Where(i=>i.ProfileId == Id && i.IsProfilePicture==true).ToListAsync();
 
-            //var matches = await _dataContext.MatchProfile.Where(m => m.MatchProfileId == Id).ToListAsync();
+            var matches = await _dataContext.MatchProfile.Where(m => m.MatchProfileId == profile.Id).Select(m => m.MatchProfileId).ToListAsync();
 
-          
+
             var profileWithImageAndMatches = new
             {
-                Profile = profile,
-                Image = image,
-                //Matches = matches
+                Profile = new { UserName = profile.UserName, Hobbies = profile.Hobbies, Preferences = profile.Preferences },
+                Image = images,
+                Matches = matches
             };
 
-            return Ok(profileWithImageAndMatches);
+
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+            };
+
+
+            var jsonString = JsonSerializer.Serialize(profileWithImageAndMatches, options);
+
+
+            return Ok(jsonString);
         }
     }
 }

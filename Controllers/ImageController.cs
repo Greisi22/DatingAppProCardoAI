@@ -25,8 +25,9 @@ namespace DatingAppProCardoAI.Controllers
             _mapper = mapper;
         }
 
+        [Authorize]
         [HttpPost("Image")]
-        public async Task<IActionResult> UploadImage([FromBody] ImageDto imagedto)
+        public async Task<IActionResult> UploadImage(IFormFile file, [FromForm] ImageDto imageDto)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -40,17 +41,34 @@ namespace DatingAppProCardoAI.Controllers
                 return BadRequest("Profile not found");
             }
 
-            var image = _mapper.Map<Domain.Image>(imagedto);
+            if (file == null || file.Length <= 0)
+            {
+                return BadRequest("Invalid file");
+            }
+
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+            var filePath = Path.Combine("Images", fileName);
 
 
-            image.ProfileId = profile.Id;
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            
+            var image = new Domain.Image
+            {
+                ProfileId = profile.Id,
+                ImageFileName = filePath,
+                Description = imageDto.Description,  
+                IsProfilePicture = imageDto.IsProfilePicture,  
+                publishedDate = imageDto.publishedDate  
+            };
 
             _dataContext.Image.Add(image);
             await _dataContext.SaveChangesAsync();
 
-           
             return Ok(image.Id);
-
         }
 
         [HttpGet("{id}")]

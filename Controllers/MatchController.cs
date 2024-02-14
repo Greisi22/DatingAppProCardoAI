@@ -32,8 +32,8 @@ namespace DatingAppProCardoAI.Controllers
                 return BadRequest("User not found!");
             }
 
-            var currentUserProfile = await _dataContext.Profile.FirstOrDefaultAsync(p => p.UserId == user.Id);
-            if (currentUserProfile == null)
+            var currentProfile = await _dataContext.Profile.FirstOrDefaultAsync(p => p.UserId == user.Id);
+            if (currentProfile == null)
             {
                 return BadRequest("Profile not found");
             }
@@ -45,15 +45,16 @@ namespace DatingAppProCardoAI.Controllers
 
             foreach (Profile profile in allProfiles)
             {
-                if (profile.Id != currentUserProfile.Id)
+                if (profile.Id != currentProfile.Id)
                 {
                     var match = new MatchProfile();
 
-                    if (match.IsMatch(currentUserProfile, profile))
+                    if (match.IsMatch(currentProfile, profile))
                     {
                         newMatch = new MatchProfile
                         {
-                            MatchProfileId = profile.Id
+                            MatchProfileId = profile.Id,
+                            CurrentProfileId = currentProfile.Id
                         };
 
                         _dataContext.MatchProfile.Add(newMatch);

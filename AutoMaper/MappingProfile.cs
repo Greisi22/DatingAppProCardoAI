@@ -8,8 +8,9 @@ namespace DatingAppProCardoAI.MappingProfile
 
             CreateMap<ProfileDto, Domain.Profile>();
             CreateMap<MessageDto, Domain.Message>();
-            CreateMap<ImageDto, Domain.Image>();
-        
+            CreateMap<ImageDto, Domain.Image>()
+           .ForMember(dest => dest.Profile, opt => opt.Ignore());
+
         }
     }
 }
