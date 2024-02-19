@@ -1,11 +1,14 @@
 using AutoMapper;
 using DatingAppProCardoAI.Data;
 using DatingAppProCardoAI.MappingProfile;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using DatingAppProCardoAI.Validations;
+using Microsoft.AspNetCore.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,8 +64,13 @@ var mapperConfig = new MapperConfiguration(mc =>
 });
 
 IMapper mapper = mapperConfig.CreateMapper();
+
+
 builder.Services.AddSingleton(mapper);
 
+
+builder.Services.AddControllersWithViews()
+    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<ProfileValidator>());
 
 builder.Services.Configure<FormOptions>(options =>
 {
@@ -70,6 +78,11 @@ builder.Services.Configure<FormOptions>(options =>
 });
 
 var app = builder.Build();
+
+
+
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

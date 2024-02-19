@@ -4,6 +4,7 @@ using DatingAppProCardoAI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DatingAppProCardoAI.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240219104519_addingAnAttributeInImage")]
+    partial class addingAnAttributeInImage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,8 +44,8 @@ namespace DatingAppProCardoAI.Migrations
                     b.Property<bool>("IsProfilePicture")
                         .HasColumnType("bit");
 
-                    b.Property<double>("MemorySize")
-                        .HasColumnType("float");
+                    b.Property<long>("MemorySize")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("ProfileId")
                         .HasColumnType("int");

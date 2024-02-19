@@ -8,6 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+//using System.ComponentModel.DataAnnotations;
+using DatingAppProCardoAI.Validations;
+using FluentValidation;
+using FluentValidation.Results;
 
 namespace DatingAppProCardoAI.Controllers
 {
@@ -19,6 +23,7 @@ namespace DatingAppProCardoAI.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly DataContext _dataContext;
         private readonly IMapper _mapper;
+
 
         public ProfileController(UserManager<IdentityUser> userManager, DataContext dataContext, IMapper mapper)
         {
@@ -52,6 +57,8 @@ namespace DatingAppProCardoAI.Controllers
                 return Conflict("Profile already exists");
             }
 
+            
+
             var profile = _mapper.Map<Domain.Profile>(profiledto);
 
             profile.UserId = user.Id;
@@ -60,6 +67,14 @@ namespace DatingAppProCardoAI.Controllers
             _dataContext.Profile.Add(profile);
             await _dataContext.SaveChangesAsync();
 
+            var validator = new ProfileValidator();
+            ValidationResult result = validator.Validate(profile);
+
+            if (!result.IsValid)
+            {
+                var errors = result.Errors.Select(e => e.ErrorMessage).ToList();
+                return BadRequest(new { errors });
+            }
 
             return Ok(profile.Id);
          
@@ -80,9 +95,21 @@ namespace DatingAppProCardoAI.Controllers
                 return NotFound("Profile not found");
             }
 
-            var images = await _dataContext.Image.Where(i => i.ProfileId == profile.Id && i.IsProfilePicture == true).ToListAsync();
+            var images = await _dataContext.Image.Where(i => i.ProfileId == profile.Id )
+                .Select(i => new
+                {
+                    i.Description,
+                    i.publishedDate,
+                    i.IsProfilePicture
+                })
+                .ToListAsync();
 
-            var matches = await _dataContext.MatchProfile.Where(m => m.MatchProfileId == profile.Id).Select(m => m.MatchProfileId).ToListAsync();
+           
+
+            var matches = await _dataContext.MatchProfile
+                .Where(m => m.CurrentProfileId == profile.Id)
+                .Select(m => m.MatchProfileId)
+                .ToListAsync();
 
 
             var profileWithImageAndMatches = new
@@ -116,9 +143,21 @@ namespace DatingAppProCardoAI.Controllers
  
             }
 
-            var images = await _dataContext.Image.Where(i=>i.ProfileId == Id && i.IsProfilePicture==true).ToListAsync();
+            var images = await _dataContext.Image.Where(i=>i.ProfileId == Id)
+                .Select(i => new
+            {
+                i.Description,
+                i.publishedDate,
+                i.IsProfilePicture
 
-            var matches = await _dataContext.MatchProfile.Where(m => m.MatchProfileId == profile.Id).Select(m => m.MatchProfileId).ToListAsync();
+                })
+                .ToListAsync();
+
+
+            var matches = await _dataContext.MatchProfile
+                .Where(m => m.CurrentProfileId == Id)
+                .Select(m => m.MatchProfileId)
+                .ToListAsync();
 
 
             var profileWithImageAndMatches = new

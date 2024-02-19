@@ -2,6 +2,8 @@
 using DatingAppProCardoAI.Data;
 
 using DatingAppProCardoAI.Dto;
+using DatingAppProCardoAI.Validations;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +42,18 @@ namespace DatingAppProCardoAI.Controllers
             var message = _mapper.Map<Domain.Message>(messagedto);
 
             message.SenderId = user.Id;
+
+
+            var validator = new MessageValidator();
+            ValidationResult result = validator.Validate(message);
+
+            if (!result.IsValid)
+            {
+                var errors = result.Errors.Select(e => e.ErrorMessage).ToList();
+                return BadRequest(new { errors });
+            }
+
+
 
             _dataContext.Message.Add(message);
             await _dataContext.SaveChangesAsync();

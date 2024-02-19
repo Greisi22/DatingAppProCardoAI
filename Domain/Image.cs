@@ -16,5 +16,6 @@ namespace DatingAppProCardoAI.Domain
         public int ProfileId { get; set; }
         public Profile Profile { get; set; }
         public bool IsProfilePicture { get; set; }
+        public double MemorySize { get; set; }
     }
 }

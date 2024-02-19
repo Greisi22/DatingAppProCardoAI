@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using DatingAppProCardoAI.Data;
 using DatingAppProCardoAI.Dto;
+using DatingAppProCardoAI.Validations;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -46,6 +49,8 @@ namespace DatingAppProCardoAI.Controllers
                 return BadRequest("Invalid file");
             }
 
+          
+
             var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
             var filePath = Path.Combine("Images", fileName);
 
@@ -55,15 +60,30 @@ namespace DatingAppProCardoAI.Controllers
                 await file.CopyToAsync(stream);
             }
 
-            
+
+            long fileSizeInBytes = file.Length;
+
+            double imageSizeInMegabytes = (double)fileSizeInBytes / (1024 * 1024);
+
             var image = new Domain.Image
             {
                 ProfileId = profile.Id,
                 ImageFileName = filePath,
                 Description = imageDto.Description,  
                 IsProfilePicture = imageDto.IsProfilePicture,  
-                publishedDate = imageDto.publishedDate  
+                publishedDate = imageDto.publishedDate,
+                MemorySize = imageSizeInMegabytes
             };
+
+
+            var validator = new ImageValidator();
+            ValidationResult result = validator.Validate(image);
+
+            if (!result.IsValid)
+            {
+                return BadRequest(result.Errors);
+            }
+
 
             _dataContext.Image.Add(image);
             await _dataContext.SaveChangesAsync();
