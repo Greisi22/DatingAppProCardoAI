@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using System.Text.Json;
-//using System.ComponentModel.DataAnnotations;
 using DatingAppProCardoAI.Validations;
 using FluentValidation;
 using FluentValidation.Results;
@@ -179,5 +178,39 @@ namespace DatingAppProCardoAI.Controllers
 
             return Ok(jsonString);
         }
+
+        [HttpPut("UpdateProfile")]
+        public async Task<IActionResult> updateProfile([FromBody] ProfileDto updatedProfileDto)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return BadRequest("User not found.");
+            }
+
+            var existingProfile = await _dataContext.Profile.FirstOrDefaultAsync(p => p.UserId == user.Id);
+
+            if (existingProfile == null)
+            {
+                return BadRequest("Profile not found.");
+            }
+
+            _mapper.Map(updatedProfileDto, existingProfile);
+
+            var validator = new ProfileValidator();
+            ValidationResult result = validator.Validate(existingProfile);
+
+            if (!result.IsValid)
+            {
+                var errors = result.Errors.Select(e => e.ErrorMessage).ToList();
+                return BadRequest(new { errors });
+            }
+
+            await _dataContext.SaveChangesAsync();
+                return Ok("Profile updated successfully");
+           
+        }
+
     }
 }
