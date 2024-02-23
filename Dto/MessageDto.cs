@@ -11,6 +11,5 @@ namespace DatingAppProCardoAI.Dto
         [Required]
         public string ContentOfMessage { get; set; }
 
-        public DateTime timeSend { get; set; }
     }
 }

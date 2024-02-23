@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
 
 
 namespace DatingAppProCardoAI.Controllers
@@ -53,7 +54,7 @@ namespace DatingAppProCardoAI.Controllers
 
             var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
             var filePath = Path.Combine("Images", fileName);
-
+             
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
@@ -91,17 +92,30 @@ namespace DatingAppProCardoAI.Controllers
             return Ok(image.Id);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetImage(int id)
+        //[HttpGet("{id}")]
+        //public async Task<IActionResult> GetImage(int id)
+        //{
+        //    var image = await _dataContext.Image.FindAsync(id);
+        //    if (image == null)
+        //    {
+        //        return NotFound("Image not found");
+        //    }
+        //    var file = System.IO.File.OpenRead(image.ImageFileName);
+        //    return File(fil, "image/jpeg");
+        //}
+
+
+
+        [HttpGet("{id}/file")]
+        public async Task<IActionResult> GetImage([FromRoute] int id)
         {
             var image = await _dataContext.Image.FindAsync(id);
             if (image == null)
             {
                 return NotFound("Image not found");
             }
-
-            return Ok(image);
+            var file = System.IO.File.OpenRead(image.ImageFileName);
+            return File(file, "image/jpeg");
         }
-        
     }
 }

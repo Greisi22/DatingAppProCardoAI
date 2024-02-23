@@ -38,7 +38,7 @@ namespace DatingAppProCardoAI.Controllers
                 return BadRequest("Profile not found");
             }
 
-            List<Profile> allProfiles = await _dataContext.Profile.FromSqlRaw("SELECT * FROM dbo.Profile").ToListAsync();
+            List<Profile> allProfiles = await _dataContext.Profile.ToListAsync();
 
 
             MatchProfile newMatch = null;

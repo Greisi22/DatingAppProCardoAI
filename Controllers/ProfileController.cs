@@ -34,7 +34,7 @@ namespace DatingAppProCardoAI.Controllers
 
 
         
-        [HttpPost("profile")]
+        [HttpPost("")]
         [Authorize]
         [Consumes("application/json")]
         public async Task<IActionResult> CreateProfile([FromBody] ProfileDto profiledto)
@@ -79,7 +79,7 @@ namespace DatingAppProCardoAI.Controllers
          
         }
 
-        [HttpGet("myprofile")]
+        [HttpGet("me")]
         public async Task<IActionResult> GetMyProfile()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -99,7 +99,8 @@ namespace DatingAppProCardoAI.Controllers
                 {
                     i.Description,
                     i.publishedDate,
-                    i.IsProfilePicture
+                    i.IsProfilePicture,
+                    i.Id
                 })
                 .ToListAsync();
 
@@ -118,23 +119,17 @@ namespace DatingAppProCardoAI.Controllers
                 Matches = matches
             };
 
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve, 
-            };
+           
 
           
-            var jsonString = JsonSerializer.Serialize(profileWithImageAndMatches, options);
-
-          
-            return Ok(jsonString);
+            return Ok(profileWithImageAndMatches);
         }
 
-        [HttpGet("Anyprofile")]
-        public async Task<IActionResult> GetAnyProfile(int Id)
+        [HttpGet("{Id}")]
+        public async Task<IActionResult> GetAnyProfile([FromRoute] int id)
         {
 
-            var profile = await _dataContext.Profile.FirstOrDefaultAsync(p => p.Id == Id);
+            var profile = await _dataContext.Profile.FirstOrDefaultAsync(p => p.Id == id);
 
             if (profile == null)
             {
@@ -142,7 +137,7 @@ namespace DatingAppProCardoAI.Controllers
  
             }
 
-            var images = await _dataContext.Image.Where(i=>i.ProfileId == Id)
+            var images = await _dataContext.Image.Where(i=>i.ProfileId == id)
                 .Select(i => new
             {
                 i.Description,
@@ -154,7 +149,7 @@ namespace DatingAppProCardoAI.Controllers
 
 
             var matches = await _dataContext.MatchProfile
-                .Where(m => m.CurrentProfileId == Id)
+                .Where(m => m.CurrentProfileId == id)
                 .Select(m => m.MatchProfileId)
                 .ToListAsync();
 
@@ -165,21 +160,11 @@ namespace DatingAppProCardoAI.Controllers
                 Image = images,
                 Matches = matches
             };
-
-
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve,
-            };
-
-
-            var jsonString = JsonSerializer.Serialize(profileWithImageAndMatches, options);
-
-
-            return Ok(jsonString);
+   
+            return Ok(profileWithImageAndMatches);
         }
 
-        [HttpPut("UpdateProfile")]
+        [HttpPut("")]
         public async Task<IActionResult> updateProfile([FromBody] ProfileDto updatedProfileDto)
         {
             var user = await _userManager.GetUserAsync(User);

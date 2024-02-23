@@ -61,8 +61,8 @@ namespace DatingAppProCardoAI.Controllers
             return Ok(message.Id);
         }
 
-        [HttpGet("Message")]
-        public async Task<IActionResult> GetChatMessages(String receiverId)
+        [HttpGet("")]
+        public async Task<IActionResult> GetChatMessages(string receiverId)
         {
             var sender = await _userManager.GetUserAsync(User);
             if (sender == null)
@@ -72,22 +72,30 @@ namespace DatingAppProCardoAI.Controllers
 
             var senderId = sender.Id;
 
+            var receiver = await _dataContext.Users.FirstOrDefaultAsync(u => u.Id == receiverId);
+            var receiverName = receiver?.UserName;
+            var senderName = sender.UserName;
+
             var chatMessages = await _dataContext.Message
+                .Include(x => x.Sender)
+                .Include(x => x.Receiver)
                 .Where(m => (m.SenderId == senderId && m.ReceiverId == receiverId) ||
                             (m.SenderId == receiverId && m.ReceiverId == senderId))
                 .OrderBy(m => m.timeSend)
                 .ToListAsync();
 
+            var messageResponseDtos = _mapper.Map<List<MessageResponseDto>>(chatMessages);
 
-            var chatMessageContents = new List<string>();
-
-            foreach (var chatMessage in chatMessages)
-            {
-                chatMessageContents.Add(chatMessage.ContentOfMessage + " " + chatMessage.timeSend);
-            }
-            return Ok(chatMessageContents);
-
+             foreach (var messageResponseDto in messageResponseDtos)
+             {
+                messageResponseDto.ReceiverName = receiverName;
+                messageResponseDto.SenderName = senderName;
+             }
+            return Ok(messageResponseDtos);
         }
+
+           
+
 
 
 
