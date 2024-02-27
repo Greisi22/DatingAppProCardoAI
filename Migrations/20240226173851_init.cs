@@ -30,6 +30,7 @@ namespace DatingAppProCardoAI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(21)", maxLength: 21, nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -157,6 +158,32 @@ namespace DatingAppProCardoAI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Friendships",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    User1Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId2 = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Friendships", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Friendships_AspNetUsers_User1Id",
+                        column: x => x.User1Id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Friendships_AspNetUsers_UserId2",
+                        column: x => x.UserId2,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Message",
                 columns: table => new
                 {
@@ -217,7 +244,8 @@ namespace DatingAppProCardoAI.Migrations
                     ImageFileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     publishedDate = table.Column<DateOnly>(type: "date", nullable: false),
                     ProfileId = table.Column<int>(type: "int", nullable: false),
-                    IsProfile = table.Column<bool>(type: "bit", nullable: false)
+                    IsProfilePicture = table.Column<bool>(type: "bit", nullable: false),
+                    MemorySize = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -294,6 +322,16 @@ namespace DatingAppProCardoAI.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Friendships_User1Id",
+                table: "Friendships",
+                column: "User1Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Friendships_UserId2",
+                table: "Friendships",
+                column: "UserId2");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Image_ProfileId",
                 table: "Image",
                 column: "ProfileId");
@@ -341,6 +379,9 @@ namespace DatingAppProCardoAI.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Friendships");
 
             migrationBuilder.DropTable(
                 name: "Image");

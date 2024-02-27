@@ -2,7 +2,6 @@
 {
     public class MessageResponseDto
     {
-
         public string SenderName { get; set; }
         public string ReceiverName { get; set; }
         public string ContentOfMessage { get; set; }

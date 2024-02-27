@@ -1,7 +1,7 @@
 ﻿using DatingAppProCardoAI.Domain;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Metadata;
+
 
 
 namespace DatingAppProCardoAI.Data
@@ -14,6 +14,11 @@ namespace DatingAppProCardoAI.Data
         public DbSet<Message> Message { get; set; }
 
         public DbSet<MatchProfile> MatchProfile { get; set; }
+
+        public DbSet<Friendships> Friendships { get; set; }
+        public DbSet<UserFriendship> UserFriendship { get; set; }
+
+        public DbSet<ApplicationUser> ApplicationUser { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -48,6 +53,21 @@ namespace DatingAppProCardoAI.Data
                 .WithMany()
                 .HasForeignKey(m => m.MatchProfileId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<UserFriendship>()
+                .HasKey(uf => new { uf.UserId, uf.FriendshipsId });
+
+            modelBuilder.Entity<UserFriendship>()
+                .HasOne(uf => uf.User)
+                .WithMany(u => u.UserFriendships)
+                .HasForeignKey(uf => uf.UserId);
+
+            modelBuilder.Entity<UserFriendship>()
+                .HasOne(uf => uf.Friendships)
+                .WithMany(f => f.UserFriendships)
+                .HasForeignKey(uf => uf.FriendshipsId);
+
+
         }
 
 

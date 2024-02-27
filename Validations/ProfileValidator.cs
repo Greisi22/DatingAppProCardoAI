@@ -15,7 +15,7 @@ namespace DatingAppProCardoAI.Validations
 
             RuleFor(profile => profile.Hobbies).Must(hobbies => hobbies != null && hobbies.Length > 0).
                 WithMessage("Hobbies are required.").
-                Must(hobbies => hobbies.Length > 3)
+                Must(hobbies => hobbies.Length >= 3)
                .WithMessage("There shouldn't be less than 3 hobbies");
 
             RuleFor(profile => profile.Description).NotEmpty().

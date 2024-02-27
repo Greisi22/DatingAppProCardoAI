@@ -23,7 +23,7 @@ namespace DatingAppProCardoAI.Controllers
             _dataContext = dataContext;
         }
 
-        [HttpPost("MatchProfile")]
+        [HttpPost("match")]
         public async Task<IActionResult> CreateMatchProfile()
         {
             var user = await _userManager.GetUserAsync(User);

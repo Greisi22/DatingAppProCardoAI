@@ -34,7 +34,7 @@ namespace DatingAppProCardoAI.Controllers
 
 
         
-        [HttpPost("")]
+        [HttpPost("create")]
         [Authorize]
         [Consumes("application/json")]
         public async Task<IActionResult> CreateProfile([FromBody] ProfileDto profiledto)

@@ -17,7 +17,24 @@ namespace DatingAppProCardoAI.MappingProfile
            .ForMember(dest => dest.ReceiverName, opt => opt.Ignore())
            .ForMember(dest => dest.ContentOfMessage, opt => opt.MapFrom(src => src.ContentOfMessage))
            .ForMember(dest => dest.SendDate, opt => opt.MapFrom(src => src.timeSend));
-           
+            CreateMap<FriendDto, Domain.UserFriendship>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.Friendships, opt => opt.MapFrom(src => new Domain.Friendships
+                {
+                    UserFriendships = new List<Domain.UserFriendship>
+        {
+            new Domain.UserFriendship
+            {
+                UserId = src.friendReceiver 
+            }
         }
+                }))
+    .ReverseMap();
+            CreateMap<Domain.Friendships, FriendshipsResponseDto>()
+                .ForMember(dest => dest.userId, opt => opt.Ignore())
+                .ForMember(dest => dest.friendId, opt => opt.Ignore());
+
+        }
+
     }
 }

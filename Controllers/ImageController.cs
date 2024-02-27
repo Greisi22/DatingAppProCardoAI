@@ -30,7 +30,7 @@ namespace DatingAppProCardoAI.Controllers
         }
 
         [Authorize]
-        [HttpPost("Image")]
+        [HttpPost("image/post")]
         public async Task<IActionResult> UploadImage(IFormFile file, [FromForm] ImageDto imageDto)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -91,18 +91,6 @@ namespace DatingAppProCardoAI.Controllers
 
             return Ok(image.Id);
         }
-
-        //[HttpGet("{id}")]
-        //public async Task<IActionResult> GetImage(int id)
-        //{
-        //    var image = await _dataContext.Image.FindAsync(id);
-        //    if (image == null)
-        //    {
-        //        return NotFound("Image not found");
-        //    }
-        //    var file = System.IO.File.OpenRead(image.ImageFileName);
-        //    return File(fil, "image/jpeg");
-        //}
 
 
 

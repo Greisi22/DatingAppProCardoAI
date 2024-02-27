@@ -9,6 +9,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using DatingAppProCardoAI.Validations;
 using Microsoft.AspNetCore.Hosting;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,10 +78,13 @@ builder.Services.Configure<FormOptions>(options =>
     options.MultipartBodyLengthLimit = int.MaxValue;
 });
 
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+});
+
+
 var app = builder.Build();
-
-
-
 
 
 
