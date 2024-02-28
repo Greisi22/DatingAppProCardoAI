@@ -25,41 +25,41 @@ namespace DatingAppProCardoAI.Controllers
         }
 
         [Authorize]
-        [HttpPost("add")]
-        public async Task<IActionResult> CreateFriendship([FromBody] FriendDto friendDto)
+        [HttpPost("")]
+        public async Task<IActionResult> createfriendship([FromBody] FriendDto frienddto)
         {
-            var authenticatedUser = await _userManager.GetUserAsync(User);
-            if (authenticatedUser == null)
+            var authenticateduser = await _userManager.GetUserAsync(User);
+            if (authenticateduser == null)
             {
-                return BadRequest("User not found.");
+                return BadRequest("user not found.");
             }
 
-            var friendUser = await _userManager.FindByIdAsync(friendDto.friendReceiver);
-            if (friendUser == null)
+            var frienduser = await _userManager.FindByIdAsync(frienddto.friendReceiver);
+            if (frienduser == null)
             {
-                return BadRequest("Friend user not found.");
+                return BadRequest("friend user not found.");
             }
 
-            var existingFriendship = await _dataContext.UserFriendship
-                .AnyAsync(uf => uf.UserId == authenticatedUser.Id && uf.Friendships.UserFriendships.Any(f => f.UserId == friendUser.Id));
+            var existingfriendship = await _dataContext.UserFriendship
+           .AnyAsync(uf => (uf.UserId == authenticateduser.Id && uf.friendId == frienduser.Id));
 
-            if (existingFriendship)
+
+            if (existingfriendship)
             {
-                return BadRequest("Friendship already exists.");
+                return BadRequest("friendship already exists.");
             }
 
-            var userFriendship = _mapper.Map<UserFriendship>(friendDto);
-            userFriendship.UserId = authenticatedUser.Id;
+            var userfriendship = _mapper.Map<UserFriendship>(frienddto);
+            userfriendship.UserId = authenticateduser.Id;
 
-            _dataContext.UserFriendship.Add(userFriendship);
+            _dataContext.UserFriendship.Add(userfriendship);
             await _dataContext.SaveChangesAsync();
 
-            return Ok("Friendship created successfully.");
+            return Ok("friendship created successfully.");
         }
 
-      
         [Authorize]
-        [HttpGet("{id}")]
+        [HttpGet("")]
         public async Task<IActionResult> GetFriends()
         {
             var authenticatedUser = await _userManager.GetUserAsync(User);
@@ -68,45 +68,18 @@ namespace DatingAppProCardoAI.Controllers
                 return BadRequest("User not found.");
             }
 
-            
-            var userFriendships = _dataContext.UserFriendship
-                .Where(uf => uf.UserId == authenticatedUser.Id)
-                .Include(uf => uf.Friendships.UserFriendships) 
+            var friendships = _dataContext.UserFriendship
+                .Where(uf => uf.UserId == authenticatedUser.Id )
+                .Select(uf => new FriendshipsResponseDto
+                {
+                    _userId =  authenticatedUser.Id ,
+                    _friendId =  uf.friendId
+                })
+                .Distinct()
                 .ToList();
 
-          
-            var friendshipsResponse = new List<FriendshipsResponseDto>();
-
-            
-            foreach (var userFriendship in userFriendships)
-            {
-               
-                var userId = userFriendship.UserId;
-                var friendIds = userFriendship.Friendships.UserFriendships
-                    .Select(uf => uf.UserId) 
-                    .ToList();
-
-
-                foreach (var friendId in friendIds)
-                {
-                    if (userId != friendId)
-                    {
-                        var friendshipDto = new FriendshipsResponseDto
-                        {
-                            userId = userId,
-                            friendId = friendId
-                        };
-                        friendshipsResponse.Add(friendshipDto);
-                    }
-                    
-
-     
-                }
-            }
-
-            return Ok(friendshipsResponse);
+            return Ok(friendships);
         }
-       
 
     }
 }

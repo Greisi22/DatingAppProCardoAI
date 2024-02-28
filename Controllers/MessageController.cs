@@ -29,7 +29,8 @@ namespace DatingAppProCardoAI.Controllers
         }
 
 
-        [HttpPost("send")]
+
+        [HttpPost("")]
         public async Task<IActionResult> CreateMessage([FromBody] MessageDto messagedto)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -38,71 +39,37 @@ namespace DatingAppProCardoAI.Controllers
                 return BadRequest("User not found!");
             }
 
+            var friendships = _dataContext.UserFriendship
+                .Where(uf => uf.UserId == user.Id && uf.friendId == messagedto.ReceiverId)
+                .ToList();
 
-            var userFriendships = _dataContext.UserFriendship
-               .Where(uf => uf.UserId == user.Id)
-               .Include(uf => uf.Friendships.UserFriendships)
-               .ToList();
-
-            var friendship = new Dictionary<string, List<string>>();
-
-            foreach (var userFriendship in userFriendships)
+            if (friendships.Count > 0)
             {
-                var userId = userFriendship.UserId;
+                var message = _mapper.Map<Domain.Message>(messagedto);
+                message.SenderId = user.Id;
 
-                if (!friendship.ContainsKey(userId))
+                var validator = new MessageValidator();
+                var result = validator.Validate(message);
+
+                if (!result.IsValid)
                 {
-                    friendship[userId] = new List<string>();
+                    var errors = result.Errors.Select(e => e.ErrorMessage).ToList();
+                    return BadRequest(new { errors });
                 }
 
-                var friendIds = userFriendship.Friendships.UserFriendships
-                    .Select(uf => uf.UserId)
-                    .ToList();
+                _dataContext.Message.Add(message);
+                await _dataContext.SaveChangesAsync();
 
-                foreach (var friendId in friendIds)
-                {
-                    if (friendId != userId)
-                    {
-                        friendship[userId].Add(friendId);
-                    }
-                }
+                return Ok(message.Id);
             }
-
-            if (friendship != null)
+            else
             {
-
-                var receiverExists = friendship.Any(pair => pair.Value.Contains(messagedto.ReceiverId));
-                if (receiverExists)
-                {
-                    var message = _mapper.Map<Domain.Message>(messagedto);
-                    message.SenderId = user.Id;
-
-                    var validator = new MessageValidator();
-                    var result = validator.Validate(message);
-
-                    if (!result.IsValid)
-                    {
-                        var errors = result.Errors.Select(e => e.ErrorMessage).ToList();
-                        return BadRequest(new { errors });
-                    }
-
-                    _dataContext.Message.Add(message);
-                    await _dataContext.SaveChangesAsync();
-
-                    return Ok(message.Id);
-                }
-                else
-                {
-                    return BadRequest("Receiver is not in your friends list.");
-                }
+                return BadRequest("Receiver is not in your friends list.");
             }
-
-            return BadRequest("You don't have any friends.");
         }
 
 
-
-        [HttpGet("{id}")]
+        [HttpGet("")]
         public async Task<IActionResult> GetChatMessages(string receiverId)
         {
             var sender = await _userManager.GetUserAsync(User);
@@ -136,7 +103,7 @@ namespace DatingAppProCardoAI.Controllers
         }
 
 
-      
+
 
     }
 }

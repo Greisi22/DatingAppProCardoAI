@@ -14,8 +14,6 @@ namespace DatingAppProCardoAI.Data
         public DbSet<Message> Message { get; set; }
 
         public DbSet<MatchProfile> MatchProfile { get; set; }
-
-        public DbSet<Friendships> Friendships { get; set; }
         public DbSet<UserFriendship> UserFriendship { get; set; }
 
         public DbSet<ApplicationUser> ApplicationUser { get; set; }
@@ -55,17 +53,19 @@ namespace DatingAppProCardoAI.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<UserFriendship>()
-                .HasKey(uf => new { uf.UserId, uf.FriendshipsId });
+                .HasKey(f => f.Id);
 
             modelBuilder.Entity<UserFriendship>()
-                .HasOne(uf => uf.User)
-                .WithMany(u => u.UserFriendships)
-                .HasForeignKey(uf => uf.UserId);
+                .HasOne(f => f.User)
+                .WithMany(u => u.userFriendships)
+                .HasForeignKey(f => f.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UserFriendship>()
-                .HasOne(uf => uf.Friendships)
-                .WithMany(f => f.UserFriendships)
-                .HasForeignKey(uf => uf.FriendshipsId);
+                .HasOne(f => f.Friend)
+                .WithMany()
+                .HasForeignKey(f => f.friendId)
+                .OnDelete(DeleteBehavior.Restrict);
 
 
         }

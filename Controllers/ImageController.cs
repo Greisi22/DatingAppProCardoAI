@@ -30,7 +30,7 @@ namespace DatingAppProCardoAI.Controllers
         }
 
         [Authorize]
-        [HttpPost("image/post")]
+        [HttpPost("post")]
         public async Task<IActionResult> UploadImage(IFormFile file, [FromForm] ImageDto imageDto)
         {
             var user = await _userManager.GetUserAsync(User);

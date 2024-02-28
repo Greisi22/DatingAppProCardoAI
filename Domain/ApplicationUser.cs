@@ -4,7 +4,6 @@ namespace DatingAppProCardoAI.Domain
 {
     public class ApplicationUser : IdentityUser
     {
-
-        public ICollection<UserFriendship> UserFriendships { get; set; }
+        public ICollection<UserFriendship> userFriendships { get; set; }
     }
 }

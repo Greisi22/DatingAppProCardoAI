@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DatingAppProCardoAI.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240226221227_Changes")]
-    partial class Changes
+    [Migration("20240228010202_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,19 +24,6 @@ namespace DatingAppProCardoAI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("DatingAppProCardoAI.Domain.Friendships", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Friendships");
-                });
 
             modelBuilder.Entity("DatingAppProCardoAI.Domain.Image", b =>
                 {
@@ -165,15 +152,25 @@ namespace DatingAppProCardoAI.Migrations
 
             modelBuilder.Entity("DatingAppProCardoAI.Domain.UserFriendship", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("FriendshipsId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.HasKey("UserId", "FriendshipsId");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.HasIndex("FriendshipsId");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("friendId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("friendId");
 
                     b.ToTable("UserFriendship");
                 });
@@ -454,19 +451,19 @@ namespace DatingAppProCardoAI.Migrations
 
             modelBuilder.Entity("DatingAppProCardoAI.Domain.UserFriendship", b =>
                 {
-                    b.HasOne("DatingAppProCardoAI.Domain.Friendships", "Friendships")
-                        .WithMany("UserFriendships")
-                        .HasForeignKey("FriendshipsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("DatingAppProCardoAI.Domain.ApplicationUser", "User")
-                        .WithMany("UserFriendships")
+                        .WithMany("userFriendships")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Friendships");
+                    b.HasOne("DatingAppProCardoAI.Domain.ApplicationUser", "Friend")
+                        .WithMany()
+                        .HasForeignKey("friendId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Friend");
 
                     b.Navigation("User");
                 });
@@ -522,11 +519,6 @@ namespace DatingAppProCardoAI.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DatingAppProCardoAI.Domain.Friendships", b =>
-                {
-                    b.Navigation("UserFriendships");
-                });
-
             modelBuilder.Entity("DatingAppProCardoAI.Domain.Profile", b =>
                 {
                     b.Navigation("images");
@@ -534,7 +526,7 @@ namespace DatingAppProCardoAI.Migrations
 
             modelBuilder.Entity("DatingAppProCardoAI.Domain.ApplicationUser", b =>
                 {
-                    b.Navigation("UserFriendships");
+                    b.Navigation("userFriendships");
                 });
 #pragma warning restore 612, 618
         }

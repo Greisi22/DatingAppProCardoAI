@@ -2,7 +2,7 @@
 {
     public class FriendshipsResponseDto
     {
-        public string userId { get; set; }
-        public string friendId { get; set;}
+        public string _userId { get; set; }
+        public string _friendId { get; set;}
     }
 }
